@@ -1,0 +1,110 @@
+class Main {
+public static void main ( String [] a ){
+System.out.println (new Punto());
+}
+}
+class Punto 
+{
+
+}
+
+@CoeffectClass
+class Ext_Nat {
+
+	// Def. for ZeroE
+	public boolean leq(Ext_Nat x) {
+		return true;
+	}
+
+	public Ext_Nat sup(Ext_Nat x) {
+		Ext_Nat result;
+		if (this.leq(x))
+			result = x;
+		else
+			result = this;
+		return result;
+	}
+
+	// Def. for ZeroE
+	public Ext_Nat sum(Ext_Nat x) {
+		return x;
+	}
+
+	// Def. for ZeroE
+	public Ext_Nat mult(Ext_Nat x) {
+		return this;
+	}
+
+	public static Ext_Nat zero() {
+		return new ZeroE();
+	}
+
+	public static Ext_Nat one() {
+		Ext_Nat result;
+		result = new SuccE().setPred(Ext_Nat.zero());
+		return result;
+	}
+}
+
+@CoeffectClass
+class ZeroE extends Ext_Nat {
+
+}
+
+@CoeffectClass
+class SuccE extends Ext_Nat {
+	Ext_Nat pred;
+
+	public Ext_Nat setPred(Ext_Nat p) {
+		pred = p;
+		return this;
+	}
+
+	public boolean leq(Ext_Nat x) {
+		boolean result;
+		if (x instanceof ZeroE)
+			result = false;
+		else if (x instanceof Infinity)
+			result = true;
+		else
+			result = pred.leq(((SuccE) x).getPred());
+		return result;
+	}
+	public Ext_Nat getPred()
+	{
+		return pred;
+	}
+
+	public Ext_Nat sum(Ext_Nat x) {
+		Ext_Nat result;
+		if (x instanceof Infinity)
+			result = x;
+		else
+			result = new SuccE().setPred(pred.sum(x));
+		return result;
+	}
+
+	public Ext_Nat mult(Ext_Nat x) {
+		Ext_Nat result;
+		if (x instanceof ZeroE || x instanceof Infinity)
+			result = x;
+		else
+			result = pred.mult(x).sum(x);
+		return result;
+	}
+}
+
+class Infinity extends Ext_Nat {
+
+	public boolean leq(Ext_Nat x) {
+		return false;
+	}
+
+	public Ext_Nat sum(Ext_Nat x) {
+		return this;
+	}
+
+	public Ext_Nat mult(Ext_Nat x) {
+		return this;
+	}
+}
